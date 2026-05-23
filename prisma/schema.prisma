@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id              String           @id @default(cuid())
+  clerkId         String           @unique
+  name            String?
+  email           String           @unique
+  imageUrl        String?
+  isPaid          Boolean          @default(false)
+  role            Role             @default(USER)
+  createdAt       DateTime         @default(now())
+  paymentRequests PaymentRequest[]
+}
+
+model MockTest {
+  id             String   @id @default(cuid())
+  title          String
+  description    String
+  googleFormLink String
+  thumbnail      String
+  category       String
+  difficulty     String // "Easy" | "Medium" | "Hard"
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model PaymentRequest {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  paymentScreenshot String
+  status            PaymentStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+}
