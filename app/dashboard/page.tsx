@@ -56,7 +56,6 @@ export default function DashboardPage() {
 
   // Filtered tests
   const filteredTests = tests.filter((test) => {
-    console.log("Filtering test:", test);
     const matchesSearch = test.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());

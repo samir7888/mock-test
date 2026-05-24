@@ -32,7 +32,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-red-950/40 border border-red-900/30 px-3 py-1.5 text-xs font-semibold text-red-400 mb-6 hover:bg-red-950/60 transition-colors">
             <BookOpen className="h-3.5 w-3.5" />
-            日本語能力試験対策 (JLPT Preparation)
+            日本語能力試験対策 (JFT Preparation)
           </div>
 
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl max-w-4xl mx-auto leading-[1.1] bg-gradient-to-b from-zinc-50 via-zinc-100 to-zinc-400 bg-clip-text text-transparent">
@@ -40,11 +40,11 @@ export default function Home() {
             <span className="bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
               Japanese Language
             </span>{" "}
-            with Authentic JLPT Mock Tests
+            with Authentic JFT Mock Tests
           </h1>
 
           <p className="mt-6 text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Prepare for JLPT N5 to N1 with comprehensive mock tests. Practice
+            Prepare for JFT N5 to N1 with comprehensive mock tests. Practice
             reading, listening, vocabulary, and grammar with real exam
             conditions and detailed feedback.
           </p>
@@ -77,14 +77,14 @@ export default function Home() {
                   <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
                 </div>
                 <div className="rounded-lg bg-zinc-900/50 px-8 py-1 text-xs text-zinc-500 font-medium">
-                  jlpt-prep.com/mock-tests
+                  JFT-prep.com/mock-tests
                 </div>
                 <div className="w-12" />
               </div>
 
               {/* Mockup Body Grid */}
               <div className="p-6 md:p-8 grid md:grid-cols-3 gap-6 text-left">
-                {/* JLPT N5 Mock Card */}
+                {/* JFT N5 Mock Card */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 relative overflow-hidden group">
                   <div className="absolute top-3 right-3 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
                     Free
@@ -93,7 +93,7 @@ export default function Home() {
                     <BookOpen className="h-5 w-5" />
                   </div>
                   <h3 className="font-bold text-zinc-100 text-lg">
-                    JLPT N5 Mock Test
+                    JFT N5 Mock Test
                   </h3>
                   <p className="text-zinc-400 text-sm mt-1.5 line-clamp-2">
                     Basic hiragana, katakana, and essential vocabulary. Perfect
@@ -109,7 +109,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* JLPT N3 Mock Card */}
+                {/* JFT N3 Mock Card */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 relative overflow-hidden group">
                   <div className="absolute top-3 right-3 rounded-full bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 text-[10px] font-bold text-amber-400">
                     Premium
@@ -118,7 +118,7 @@ export default function Home() {
                     <Target className="h-5 w-5" />
                   </div>
                   <h3 className="font-bold text-zinc-100 text-lg">
-                    JLPT N3 Mock Test
+                    JFT N3 Mock Test
                   </h3>
                   <p className="text-zinc-400 text-sm mt-1.5 line-clamp-2">
                     Intermediate kanji, grammar patterns, and reading
@@ -130,11 +130,11 @@ export default function Home() {
                     </span>
                     <span className="text-xs font-semibold text-orange-400">
                       Locked
-                    </span>
+                    </span> 
                   </div>
                 </div>
 
-                {/* JLPT N1 Mock Card */}
+                {/* JFT N1 Mock Card */}
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 relative overflow-hidden group">
                   <div className="absolute top-3 right-3 rounded-full bg-red-500/10 border border-red-500/25 px-2 py-0.5 text-[10px] font-bold text-red-400">
                     Premium
@@ -143,7 +143,7 @@ export default function Home() {
                     <Award className="h-5 w-5" />
                   </div>
                   <h3 className="font-bold text-zinc-100 text-lg">
-                    JLPT N1 Mock Test
+                    JFT N1 Mock Test
                   </h3>
                   <p className="text-zinc-400 text-sm mt-1.5 line-clamp-2">
                     Advanced Japanese proficiency with complex texts, nuanced
@@ -168,7 +168,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl bg-gradient-to-b from-zinc-50 to-zinc-400 bg-clip-text text-transparent">
-              Everything You Need for JLPT Success
+              Everything You Need for JFT Success
             </h2>
             <p className="mt-4 text-zinc-400">
               Comprehensive Japanese language preparation with authentic exam
@@ -183,10 +183,10 @@ export default function Home() {
                 <BookOpen className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-zinc-100">
-                Authentic JLPT Mock Tests
+                Authentic JFT Mock Tests
               </h3>
               <p className="text-zinc-400 mt-3 text-sm leading-relaxed">
-                Practice with real JLPT format questions covering vocabulary,
+                Practice with real JFT format questions covering vocabulary,
                 grammar, reading, and listening for all levels N5-N1.
               </p>
             </div>
@@ -225,7 +225,7 @@ export default function Home() {
                 <Globe className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-zinc-100">
-                All JLPT Levels
+                All JFT Levels
               </h3>
               <p className="text-zinc-400 mt-3 text-sm leading-relaxed">
                 From beginner N5 to advanced N1, practice at your level and
@@ -268,7 +268,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl bg-gradient-to-b from-zinc-50 to-zinc-400 bg-clip-text text-transparent">
-              Start Your JLPT Journey in 3 Steps
+              Start Your JFT Journey in 3 Steps
             </h2>
             <p className="mt-4 text-zinc-400">
               Begin practicing with authentic Japanese mock tests in minutes.
@@ -316,7 +316,7 @@ export default function Home() {
                 Start Practicing
               </h3>
               <p className="text-zinc-400 mt-2 text-sm leading-relaxed max-w-xs">
-                Take authentic JLPT mock tests with real timing, get detailed
+                Take authentic JFT mock tests with real timing, get detailed
                 feedback, and track your progress.
               </p>
             </div>
@@ -332,11 +332,11 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl bg-gradient-to-b from-zinc-50 to-zinc-400 bg-clip-text text-transparent">
-                Why Choose Our JLPT Preparation Platform
+                Why Choose Our JFT Preparation Platform
               </h2>
               <p className="mt-4 text-zinc-400 leading-relaxed">
                 Unlike generic language apps, our platform focuses exclusively
-                on JLPT preparation with authentic exam formats, real timing,
+                on JFT preparation with authentic exam formats, real timing,
                 and comprehensive feedback to maximize your success.
               </p>
 
@@ -344,7 +344,7 @@ export default function Home() {
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span className="text-zinc-300 text-sm">
-                    <strong>Authentic Format:</strong> Practice with real JLPT
+                    <strong>Authentic Format:</strong> Practice with real JFT
                     question types and exam structure for all levels.
                   </span>
                 </li>
@@ -352,7 +352,7 @@ export default function Home() {
                   <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span className="text-zinc-300 text-sm">
                     <strong>Expert Content:</strong> Questions created by
-                    Japanese language experts and JLPT veterans.
+                    Japanese language experts and JFT veterans.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -379,14 +379,14 @@ export default function Home() {
               </h3>
               <p className="text-zinc-400 text-sm mt-2 leading-relaxed">
                 Join thousands of students who have successfully passed their
-                JLPT exams with our preparation platform:
+                JFT exams with our preparation platform:
               </p>
 
               {/* Mini testimonial cards */}
               <div className="mt-6 space-y-4">
                 <div className="rounded-xl border border-zinc-800/80 bg-zinc-950 p-4">
                   <p className="text-zinc-300 text-xs italic">
-                    "The mock tests were incredibly similar to the actual JLPT
+                    "The mock tests were incredibly similar to the actual JFT
                     N2 exam. The timing practice helped me manage my time
                     perfectly on test day!"
                   </p>
@@ -395,7 +395,7 @@ export default function Home() {
                       YT
                     </div>
                     <span className="text-zinc-400 text-xs font-semibold">
-                      Yuki Tanaka (JLPT N2 Pass)
+                      Yuki Tanaka (JFT N2 Pass)
                     </span>
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function Home() {
                       MS
                     </div>
                     <span className="text-zinc-400 text-xs font-semibold">
-                      Maria Santos (JLPT N1 Pass)
+                      Maria Santos (JFT N1 Pass)
                     </span>
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export default function Home() {
               Simple, Affordable Pricing
             </h2>
             <p className="mt-4 text-zinc-400">
-              Get unlimited access to all JLPT levels with one-time payment. No
+              Get unlimited access to all JFT levels with one-time payment. No
               subscriptions, no hidden fees.
             </p>
           </div>
@@ -442,10 +442,10 @@ export default function Home() {
             </div>
 
             <h3 className="text-2xl font-bold text-zinc-100">
-              Premium JLPT Access
+              Premium JFT Access
             </h3>
             <p className="text-zinc-400 text-sm mt-2 leading-relaxed">
-              Unlock all JLPT levels (N5-N1) with unlimited mock tests and
+              Unlock all JFT levels (N5-N1) with unlimited mock tests and
               detailed feedback.
             </p>
 
@@ -462,7 +462,7 @@ export default function Home() {
             <ul className="mt-8 space-y-4 text-left border-t border-zinc-800/80 pt-6">
               <li className="flex items-center gap-2.5 text-sm text-zinc-300">
                 <CheckCircle className="h-4.5 w-4.5 text-red-400 flex-shrink-0" />
-                All JLPT levels (N5, N4, N3, N2, N1)
+                All JFT levels (N5, N4, N3, N2, N1)
               </li>
               <li className="flex items-center gap-2.5 text-sm text-zinc-300">
                 <CheckCircle className="h-4.5 w-4.5 text-red-400 flex-shrink-0" />
@@ -504,7 +504,7 @@ export default function Home() {
               Frequently Asked Questions
             </h2>
             <p className="mt-4 text-zinc-400">
-              Everything you need to know about our JLPT preparation platform.
+              Everything you need to know about our JFT preparation platform.
             </p>
           </div>
 
@@ -513,10 +513,10 @@ export default function Home() {
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/20 p-6">
               <h3 className="flex items-center gap-2.5 font-bold text-zinc-100 text-lg">
                 <HelpCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
-                What JLPT levels are available?
+                What JFT levels are available?
               </h3>
               <p className="mt-3 text-zinc-400 text-sm leading-relaxed pl-7">
-                We offer comprehensive mock tests for all JLPT levels from N5
+                We offer comprehensive mock tests for all JFT levels from N5
                 (beginner) to N1 (advanced). Each level includes vocabulary,
                 grammar, reading, and listening practice sections that mirror
                 the actual exam format.
@@ -527,12 +527,12 @@ export default function Home() {
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/20 p-6">
               <h3 className="flex items-center gap-2.5 font-bold text-zinc-100 text-lg">
                 <HelpCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
-                How accurate are the mock tests compared to real JLPT?
+                How accurate are the mock tests compared to real JFT?
               </h3>
               <p className="mt-3 text-zinc-400 text-sm leading-relaxed pl-7">
                 Our mock tests are created by Japanese language experts and
                 follow the exact format, timing, and difficulty level of
-                official JLPT exams. Many students report that our tests closely
+                official JFT exams. Many students report that our tests closely
                 match their actual exam experience.
               </p>
             </div>
@@ -547,7 +547,7 @@ export default function Home() {
                 Yes! Our premium tests include authentic listening practice with
                 native Japanese audio for all levels. You'll practice with the
                 same types of conversations, announcements, and presentations
-                found in real JLPT exams.
+                found in real JFT exams.
               </p>
             </div>
 
@@ -560,7 +560,7 @@ export default function Home() {
               <p className="mt-3 text-zinc-400 text-sm leading-relaxed pl-7">
                 Your dashboard shows detailed analytics including scores by
                 section, improvement over time, weak areas to focus on, and
-                estimated readiness for each JLPT level. You can retake tests
+                estimated readiness for each JFT level. You can retake tests
                 unlimited times to track improvement.
               </p>
             </div>
@@ -587,11 +587,11 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/30 p-8 md:p-12 text-center backdrop-blur-xl relative">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-zinc-100">
-              Ready to Pass Your JLPT Exam?
+              Ready to Pass Your JFT Exam?
             </h2>
             <p className="mt-4 text-zinc-400 max-w-xl mx-auto">
               Join thousands of successful students who have achieved their
-              Japanese language goals with our comprehensive JLPT preparation
+              Japanese language goals with our comprehensive JFT preparation
               platform.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
