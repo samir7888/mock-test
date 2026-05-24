@@ -22,7 +22,10 @@ export async function syncUser() {
       where: { clerkId: clerkUser.id },
     });
 
-    const name = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || clerkUser.username || "User";
+    const name =
+      `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() ||
+      clerkUser.username ||
+      "User";
     const imageUrl = clerkUser.imageUrl;
 
     if (!dbUser) {
@@ -45,7 +48,11 @@ export async function syncUser() {
       console.log(`Created new user in db: ${email} with role: ${role}`);
     } else {
       // Update details if they changed in Clerk
-      if (dbUser.name !== name || dbUser.imageUrl !== imageUrl || dbUser.email !== email) {
+      if (
+        dbUser.name !== name ||
+        dbUser.imageUrl !== imageUrl ||
+        dbUser.email !== email
+      ) {
         dbUser = await prisma.user.update({
           where: { clerkId: clerkUser.id },
           data: {

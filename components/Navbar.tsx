@@ -3,40 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { BookOpen, ShieldAlert, Award, CreditCard, LayoutDashboard } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getDbUser } from "@/actions/user";
-
-interface DbUser {
-  role: "ADMIN" | "USER";
-  isPaid: boolean;
-}
+import {
+  BookOpen,
+  ShieldAlert,
+  Award,
+  CreditCard,
+  LayoutDashboard,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { user, isLoaded, isSignedIn } = useUser();
-  const [dbUser, setDbUser] = useState<DbUser | null>(null);
-
-  useEffect(() => {
-    async function fetchDbUser() {
-      if (user?.id) {
-        const data = await getDbUser(user.id);
-        if (data) {
-          setDbUser({
-            role: data.role as "ADMIN" | "USER",
-            isPaid: data.isPaid,
-          });
-        }
-      } else {
-        setDbUser(null);
-      }
-    }
-    fetchDbUser();
-  }, [user]);
+  const { dbUser } = useAuth();
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, protected: true },
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+      protected: true,
+    },
     { name: "Pricing & Access", href: "/pricing", icon: CreditCard },
   ];
 
@@ -58,7 +46,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-1.5">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
-            
+
             // Skip protected links if not logged in
             if (link.protected && !user) return null;
 
@@ -114,17 +102,19 @@ export default function Navbar() {
                   Get Premium
                 </Link>
               )}
-              <UserButton 
+              <UserButton
                 appearance={{
                   elements: {
-                    userButtonAvatarBox: "h-9 w-9 rounded-xl border border-zinc-800",
-                    userButtonTrigger: "focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded-xl",
-                  }
+                    userButtonAvatarBox:
+                      "h-9 w-9 rounded-xl border border-zinc-800",
+                    userButtonTrigger:
+                      "focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded-xl",
+                  },
                 }}
               />
             </div>
           )}
-          
+
           {isLoaded && !isSignedIn && (
             <div className="flex items-center gap-3">
               <Link

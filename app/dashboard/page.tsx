@@ -1,43 +1,27 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/components/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { getMockTests } from "@/actions/mockTest";
-import {
-  Search,
-  Filter,
-  Lock,
-  Unlock,
-  Award,
-  ExternalLink,
-  SearchX,
-  BookOpen,
-  HelpCircle,
-  TrendingUp,
-  ShieldCheck,
-  Loader2,
-} from "lucide-react";
+import { Search, Lock, Unlock, ExternalLink, SearchX, Filter } from "lucide-react";
 import Link from "next/link";
 
 interface MockTest {
   id: string;
   title: string;
-  description: string;
   googleFormLink: string;
-  thumbnail: string;
-  category: string;
-  difficulty: string;
+  category?: string;
   isActive: boolean;
   createdAt: string | Date;
 }
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const { success, error, info } = useToast();
-  const { dbUser, isLoading: authLoading, hasPremium } = useAuth();
+  const { error } = useToast();
+  const { isLoading: authLoading, hasPremium } = useAuth();
 
   // States
   const [tests, setTests] = useState<MockTest[]>([]);
@@ -45,8 +29,9 @@ export default function DashboardPage() {
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState<
+    "ALL" | "TIMED" | "NON_TIMED"
+  >("ALL");
 
   useEffect(() => {
     async function loadTests() {
@@ -54,7 +39,7 @@ export default function DashboardPage() {
         // Fetch tests
         const data = await getMockTests();
         // Filter only active tests for standard dashboard (Admin can see inactive ones in admin portal)
-        const activeTests = data.filter((t: any) => t.isActive);
+        const activeTests = data.filter((t: MockTest) => t.isActive);
         setTests(activeTests);
       } catch (err) {
         console.error("Failed to load mock tests:", err);
@@ -69,26 +54,15 @@ export default function DashboardPage() {
 
   const loading = authLoading || testsLoading;
 
-  // Categories extraction
-  const categories = [
-    "All",
-    ...Array.from(new Set(tests.map((t) => t.category))),
-  ];
-  const difficulties = ["All", "Easy", "Medium", "Hard"];
-
   // Filtered tests
   const filteredTests = tests.filter((test) => {
-    const matchesSearch =
-      test.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      test.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      test.category.toLowerCase().includes(searchQuery.toLowerCase());
-
+    console.log("Filtering test:", test);
+    const matchesSearch = test.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === "All" || test.category === selectedCategory;
-    const matchesDifficulty =
-      selectedDifficulty === "All" || test.difficulty === selectedDifficulty;
-
-    return matchesSearch && matchesCategory && matchesDifficulty;
+      selectedCategory === "ALL" || test.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -146,13 +120,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Search & Filters */}
-        <div className="mb-8 grid md:grid-cols-12 gap-4 items-center">
+        <div className="mb-8 space-y-4">
           {/* Search Box */}
-          <div className="md:col-span-6 relative">
+          <div className="relative">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
-              placeholder="Search mock tests by name, code or categories..."
+              placeholder="Search mock tests by title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-zinc-900/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-3 pl-10 pr-4 transition-all duration-200 placeholder:text-zinc-600 text-sm"
@@ -160,37 +134,42 @@ export default function DashboardPage() {
           </div>
 
           {/* Category Filter */}
-          <div className="md:col-span-3 relative">
-            <Filter className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 pointer-events-none" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full bg-zinc-900/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-3 pl-10 pr-4 transition-all duration-200 text-sm cursor-pointer appearance-none"
-            >
-              <option value="All">All Categories</option>
-              {categories
-                .filter((c) => c !== "All")
-                .map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-            </select>
-          </div>
-
-          {/* Difficulty Filter */}
-          <div className="md:col-span-3 relative">
-            <TrendingUp className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 pointer-events-none" />
-            <select
-              value={selectedDifficulty}
-              onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="w-full bg-zinc-900/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-3 pl-10 pr-4 transition-all duration-200 text-sm cursor-pointer appearance-none"
-            >
-              <option value="All">All Difficulties</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-zinc-400 text-sm font-semibold">
+              <Filter className="h-4 w-4" />
+              Category:
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setSelectedCategory("ALL")}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${selectedCategory === "ALL"
+                    ? "bg-indigo-600 text-white shadow-lg"
+                    : "bg-zinc-900/60 border border-zinc-800 text-zinc-300 hover:text-zinc-100 hover:border-zinc-700"
+                  }`}
+              >
+                All Tests
+              </button>
+              <button
+                onClick={() => setSelectedCategory("NON_TIMED")}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${selectedCategory === "NON_TIMED"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "bg-zinc-900/60 border border-zinc-800 text-zinc-300 hover:text-zinc-100 hover:border-zinc-700"
+                  }`}
+              >
+                <span className="h-2 w-2 rounded-full bg-current" />
+                Non Timed
+              </button>
+              <button
+                onClick={() => setSelectedCategory("TIMED")}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all ${selectedCategory === "TIMED"
+                    ? "bg-amber-600 text-white shadow-lg"
+                    : "bg-zinc-900/60 border border-zinc-800 text-zinc-300 hover:text-zinc-100 hover:border-zinc-700"
+                  }`}
+              >
+                <span className="h-2 w-2 rounded-full bg-current" />
+                Timed
+              </button>
+            </div>
           </div>
         </div>
 
@@ -221,66 +200,31 @@ export default function DashboardPage() {
               No mock tests found
             </h3>
             <p className="text-xs text-zinc-500 mt-2 max-w-xs mx-auto leading-relaxed">
-              We couldn't find any mock tests matching your search or filters.
+              We could not find any mock tests matching your search or filters.
               Try adjusting your query or resetting selectors.
             </p>
             <button
               onClick={() => {
                 setSearchQuery("");
-                setSelectedCategory("All");
-                setSelectedDifficulty("All");
               }}
               className="mt-5 inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 px-4 text-xs font-semibold text-zinc-300 hover:text-white"
             >
-              Reset Filters
+              Reset Search
             </button>
           </div>
         ) : (
           /* Grid of Tests */
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTests.map((test) => {
-              const difficultyColors: any = {
-                Easy: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                Medium: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                Hard: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-              };
-
               return (
                 <div
                   key={test.id}
                   className={`rounded-2xl border border-zinc-800 bg-zinc-900/30 overflow-hidden relative group transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700 flex flex-col h-full`}
                 >
-                  {/* Thumbnail / Category tags header */}
-                  <div className="relative h-44 w-full bg-zinc-950 overflow-hidden">
-                    <img
-                      src={
-                        test.thumbnail ||
-                        "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=600&auto=format&fit=crop"
-                      }
-                      alt={test.title}
-                      className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                        !hasPremium
-                          ? "blur-[6px] opacity-40 scale-102"
-                          : "opacity-75"
-                      }`}
-                    />
-
-                    {/* Glowing effect inside image */}
+                  {/* Header with simple gradient */}
+                  <div className="relative h-32 w-full bg-gradient-to-br from-indigo-600/20 to-purple-600/20 overflow-hidden">
+                    {/* Glowing effect */}
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
-
-                    {/* Difficulty Badge */}
-                    <span
-                      className={`absolute top-3 left-3 rounded-lg border px-2.5 py-0.5 text-[10px] font-bold ${
-                        difficultyColors[test.difficulty]
-                      }`}
-                    >
-                      {test.difficulty}
-                    </span>
-
-                    {/* Category tag */}
-                    <span className="absolute top-3 right-3 rounded-lg border border-zinc-800 bg-zinc-900/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-semibold text-zinc-300">
-                      {test.category}
-                    </span>
 
                     {/* Lock visual for unpaid */}
                     {!hasPremium && (
@@ -298,18 +242,22 @@ export default function DashboardPage() {
                   {/* Body Content */}
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="font-bold text-zinc-100 text-lg leading-snug group-hover:text-indigo-400 transition-colors">
-                        {test.title}
-                      </h3>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <h3 className="font-bold text-zinc-100 text-lg leading-snug group-hover:text-indigo-400 transition-colors">
+                          {test.title}
+                        </h3>
+                        <span
+                          className={`inline-flex rounded-lg px-2 py-1 text-[9px] font-bold whitespace-nowrap ${test.category === "TIMED"
+                              ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                              : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                            }`}
+                        >
+                          {test.category || "NON_TIMED"}
+                        </span>
+                      </div>
 
-                      <p
-                        className={`text-zinc-400 text-xs mt-2 leading-relaxed ${
-                          !hasPremium
-                            ? "line-clamp-2 select-none blur-[0.6px]"
-                            : "line-clamp-3"
-                        }`}
-                      >
-                        {test.description}
+                      <p className="text-zinc-400 text-xs mt-2 leading-relaxed">
+                        Click to access this mock test and practice your skills.
                       </p>
                     </div>
 
@@ -321,7 +269,9 @@ export default function DashboardPage() {
 
                       {hasPremium ? (
                         <Link
-                          href={`/dashboard/mock-tests/${test.id}`}
+                          href={`${test.googleFormLink}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="inline-flex h-8.5 items-center gap-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white px-4 transition-colors"
                         >
                           Start Test

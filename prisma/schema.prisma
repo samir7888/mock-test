@@ -17,6 +17,11 @@ enum PaymentStatus {
   REJECTED
 }
 
+enum MockTestCategory {
+  TIMED
+  NON_TIMED
+}
+
 model User {
   id              String           @id @default(cuid())
   clerkId         String           @unique
@@ -30,16 +35,13 @@ model User {
 }
 
 model MockTest {
-  id             String   @id @default(cuid())
+  id             String           @id @default(cuid())
   title          String
-  description    String
   googleFormLink String
-  thumbnail      String
-  category       String
-  difficulty     String // "Easy" | "Medium" | "Hard"
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  category       MockTestCategory @default(NON_TIMED)
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 }
 
 model PaymentRequest {

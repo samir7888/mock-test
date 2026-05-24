@@ -9,11 +9,8 @@ import { prisma } from "@/lib/prisma";
 // Internal schema for validation (not exported)
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
   googleFormLink: z.string().url("Must be a valid Google Form URL"),
-  thumbnail: z.string().url("Must be a valid thumbnail image URL"),
-  category: z.string().min(2, "Category must be at least 2 characters"),
-  difficulty: z.enum(["Easy", "Medium", "Hard"]),
+  category: z.enum(["TIMED", "NON_TIMED"]).default("NON_TIMED"),
   isActive: z.boolean().default(true),
 });
 
@@ -120,7 +117,7 @@ export async function createMockTest(input: MockTestInput) {
 // Update an existing mock test (Admin only)
 export async function updateMockTest(
   id: string,
-  input: Partial<MockTestInput>
+  input: Partial<MockTestInput>,
 ) {
   try {
     await requireAdmin();

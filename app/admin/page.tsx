@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/components/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
@@ -76,20 +75,36 @@ export default function AdminDashboardPage() {
 
   // Form Fields
   const [formTitle, setFormTitle] = useState("");
-  const [formDescription, setFormDescription] = useState("");
   const [formLink, setFormLink] = useState("");
-  const [formThumbnail, setFormThumbnail] = useState("");
-  const [formCategory, setFormCategory] = useState("");
-  const [formDifficulty, setFormDifficulty] = useState<
-    "Easy" | "Medium" | "Hard"
-  >("Medium");
+  const [formCategory, setFormCategory] = useState<"TIMED" | "NON_TIMED">(
+    "NON_TIMED"
+  );
   const [formIsActive, setFormIsActive] = useState(true);
   const [formSubmitting, setFormSubmitting] = useState(false);
 
-  // Load initial data
+  // Load initial data only once
   useEffect(() => {
     loadAnalyticsAndPayments();
   }, []);
+
+  // Handle Tab Switch - only load data when tab changes, not on every dependency change
+  useEffect(() => {
+    if (activeTab === "users") {
+      loadUsers();
+    } else if (activeTab === "tests") {
+      loadTests();
+    }
+  }, [activeTab]);
+
+  // Handle users search and pagination separately to avoid multiple calls
+  useEffect(() => {
+    if (activeTab === "users") {
+      const timeoutId = setTimeout(() => {
+        loadUsers();
+      }, 300); // Debounce search
+      return () => clearTimeout(timeoutId);
+    }
+  }, [usersSearch, usersPage]);
 
   // Loaders
   async function loadAnalyticsAndPayments() {
@@ -108,6 +123,7 @@ export default function AdminDashboardPage() {
   }
 
   async function loadUsers() {
+    if (activeTab !== "users") return; // Only load if on users tab
     setUsersLoading(true);
     try {
       const res = await adminGetUsers(usersSearch, usersPage, 8);
@@ -121,6 +137,7 @@ export default function AdminDashboardPage() {
   }
 
   async function loadTests() {
+    if (activeTab !== "tests") return; // Only load if on tests tab
     setTestsLoading(true);
     try {
       const res = await getMockTests();
@@ -132,17 +149,6 @@ export default function AdminDashboardPage() {
       setTestsLoading(false);
     }
   }
-
-  // Handle Tab Switch
-  useEffect(() => {
-    if (activeTab === "users") {
-      loadUsers();
-    } else if (activeTab === "tests") {
-      loadTests();
-    } else if (activeTab === "analytics") {
-      loadAnalyticsAndPayments();
-    }
-  }, [activeTab, usersPage, usersSearch]);
 
   // Actions: Users
   const handleTogglePaid = async (userId: string) => {
@@ -208,8 +214,6 @@ export default function AdminDashboardPage() {
       return;
     }
 
-  
-
     try {
       const res = await adminRejectPaymentRequest(requestId);
       if (res.success) {
@@ -270,11 +274,8 @@ export default function AdminDashboardPage() {
     setModalMode("create");
     setSelectedTestId(null);
     setFormTitle("");
-    setFormDescription("");
     setFormLink("");
-    setFormThumbnail("");
-    setFormCategory("");
-    setFormDifficulty("Medium");
+    setFormCategory("NON_TIMED");
     setFormIsActive(true);
     setIsModalOpen(true);
   };
@@ -283,12 +284,8 @@ export default function AdminDashboardPage() {
     setModalMode("edit");
     setSelectedTestId(test.id);
     setFormTitle(test.title);
-    setFormDescription(test.description);
-    // Real links are saved, and the admin will be able to retrieve them securely since hasAccess is true for Admin
     setFormLink(test.googleFormLink);
-    setFormThumbnail(test.thumbnail);
-    setFormCategory(test.category);
-    setFormDifficulty(test.difficulty);
+    setFormCategory(test.category || "NON_TIMED");
     setFormIsActive(test.isActive);
     setIsModalOpen(true);
   };
@@ -296,14 +293,8 @@ export default function AdminDashboardPage() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !formTitle ||
-      !formDescription ||
-      !formLink ||
-      !formThumbnail ||
-      !formCategory
-    ) {
-      error("All form fields are required!");
+    if (!formTitle || !formLink) {
+      error("Title and Google Form Link are required!");
       return;
     }
 
@@ -311,11 +302,8 @@ export default function AdminDashboardPage() {
     try {
       const payload = {
         title: formTitle,
-        description: formDescription,
         googleFormLink: formLink,
-        thumbnail: formThumbnail,
         category: formCategory,
-        difficulty: formDifficulty,
         isActive: formIsActive,
       };
 
@@ -401,11 +389,10 @@ export default function AdminDashboardPage() {
           <div className="flex bg-zinc-900/60 border border-zinc-800 p-1 rounded-xl">
             <button
               onClick={() => setActiveTab("analytics")}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                activeTab === "analytics"
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "analytics"
                   ? "bg-indigo-600 text-white shadow-lg"
                   : "text-zinc-400 hover:text-zinc-200"
-              }`}
+                }`}
             >
               <LayoutDashboard className="h-4 w-4" />
               Payments & Stats
@@ -415,22 +402,20 @@ export default function AdminDashboardPage() {
                 setActiveTab("users");
                 setUsersPage(1);
               }}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                activeTab === "users"
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "users"
                   ? "bg-indigo-600 text-white shadow-lg"
                   : "text-zinc-400 hover:text-zinc-200"
-              }`}
+                }`}
             >
               <Users className="h-4 w-4" />
               User Control
             </button>
             <button
               onClick={() => setActiveTab("tests")}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                activeTab === "tests"
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "tests"
                   ? "bg-indigo-600 text-white shadow-lg"
                   : "text-zinc-400 hover:text-zinc-200"
-              }`}
+                }`}
             >
               <Award className="h-4 w-4" />
               Mock Test CRUD
@@ -497,22 +482,22 @@ export default function AdminDashboardPage() {
                 {/* Bulk Actions */}
                 {paymentsList.filter((req) => req.status === "PENDING").length >
                   0 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleBulkApprove}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/30 px-3 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all"
-                      title="Approve all pending requests"
-                    >
-                      <CheckCircle className="h-3.5 w-3.5" />
-                      Approve All (
-                      {
-                        paymentsList.filter((req) => req.status === "PENDING")
-                          .length
-                      }
-                      )
-                    </button>
-                  </div>
-                )}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleBulkApprove}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/30 px-3 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all"
+                        title="Approve all pending requests"
+                      >
+                        <CheckCircle className="h-3.5 w-3.5" />
+                        Approve All (
+                        {
+                          paymentsList.filter((req) => req.status === "PENDING")
+                            .length
+                        }
+                        )
+                      </button>
+                    </div>
+                  )}
               </div>
 
               {paymentsLoading ? (
@@ -564,13 +549,12 @@ export default function AdminDashboardPage() {
                           </td>
                           <td className="p-4 text-center">
                             <span
-                              className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold ${
-                                req.status === "PENDING"
+                              className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold ${req.status === "PENDING"
                                   ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                                   : req.status === "APPROVED"
-                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                  : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                              }`}
+                                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                }`}
                             >
                               {req.status}
                             </span>
@@ -674,22 +658,20 @@ export default function AdminDashboardPage() {
                           </td>
                           <td className="p-4">
                             <span
-                              className={`inline-flex rounded-lg px-2 py-0.5 text-[9px] font-bold ${
-                                u.role === "ADMIN"
+                              className={`inline-flex rounded-lg px-2 py-0.5 text-[9px] font-bold ${u.role === "ADMIN"
                                   ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
                                   : "bg-zinc-800 text-zinc-400"
-                              }`}
+                                }`}
                             >
                               {u.role}
                             </span>
                           </td>
                           <td className="p-4 text-center">
                             <span
-                              className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold ${
-                                u.isPaid
+                              className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold ${u.isPaid
                                   ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                   : "bg-zinc-800 text-zinc-500"
-                              }`}
+                                }`}
                             >
                               {u.isPaid ? "PAID" : "UNPAID"}
                             </span>
@@ -701,11 +683,10 @@ export default function AdminDashboardPage() {
                             <div className="inline-flex gap-2">
                               <button
                                 onClick={() => handleTogglePaid(u.id)}
-                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
-                                  u.isPaid
+                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors ${u.isPaid
                                     ? "bg-zinc-850 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white"
                                     : "bg-emerald-600/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-600 hover:text-white"
-                                }`}
+                                  }`}
                               >
                                 {u.isPaid ? "Revoke Access" : "Grant Access"}
                               </button>
@@ -785,11 +766,11 @@ export default function AdminDashboardPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-zinc-800 bg-zinc-950 text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
-                      <th className="p-4 pl-6">Thumbnail</th>
-                      <th className="p-4">Title</th>
+                      <th className="p-4 pl-6">Title</th>
                       <th className="p-4">Category</th>
-                      <th className="p-4">Difficulty</th>
+                      <th className="p-4">Google Form Link</th>
                       <th className="p-4 text-center">Status</th>
+                      <th className="p-4">Created Date</th>
                       <th className="p-4 pr-6 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -799,46 +780,42 @@ export default function AdminDashboardPage() {
                         key={test.id}
                         className="hover:bg-zinc-900/20 text-zinc-300"
                       >
-                        <td className="p-4 pl-6">
-                          <img
-                            src={
-                              test.thumbnail ||
-                              "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=100"
-                            }
-                            alt={test.title}
-                            className="h-8 w-14 rounded-lg object-cover border border-zinc-850"
-                          />
-                        </td>
-                        <td className="p-4 font-bold text-zinc-200">
+                        <td className="p-4 pl-6 font-bold text-zinc-200">
                           {test.title}
-                        </td>
-                        <td className="p-4 font-medium text-zinc-400">
-                          {test.category}
                         </td>
                         <td className="p-4">
                           <span
-                            className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold border ${
-                              test.difficulty === "Easy"
-                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                : test.difficulty === "Medium"
-                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                            }`}
+                            className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold ${test.category === "TIMED"
+                                ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                              }`}
                           >
-                            {test.difficulty}
+                            {test.category || "NON_TIMED"}
                           </span>
+                        </td>
+                        <td className="p-4 font-mono text-zinc-400 max-w-xs truncate">
+                          <a
+                            href={test.googleFormLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-400 hover:text-indigo-300 underline"
+                          >
+                            {test.googleFormLink}
+                          </a>
                         </td>
                         <td className="p-4 text-center">
                           <button
                             onClick={() => handleToggleTestActive(test)}
-                            className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold border transition-colors ${
-                              test.isActive
+                            className={`inline-flex rounded-lg px-2.5 py-0.5 text-[9px] font-bold border transition-colors ${test.isActive
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-zinc-800"
                                 : "bg-zinc-900 text-zinc-500 border-zinc-800 hover:bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             {test.isActive ? "ACTIVE" : "INACTIVE"}
                           </button>
+                        </td>
+                        <td className="p-4 text-zinc-500">
+                          {new Date(test.createdAt).toLocaleDateString()}
                         </td>
                         <td className="p-4 pr-6 text-right">
                           <div className="inline-flex gap-2">
@@ -891,52 +868,22 @@ export default function AdminDashboardPage() {
             </div>
 
             <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
-              {/* Row 1: Title & Category */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1.5 uppercase tracking-wider">
-                    Test Title
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. IOE Physics Module A"
-                    value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-2.5 px-3 transition-all duration-200 text-xs"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1.5 uppercase tracking-wider">
-                    Category
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. IOE, CSIT, CMAT"
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-2.5 px-3 transition-all duration-200 text-xs"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Row 2: Description */}
+              {/* Row 1: Title */}
               <div>
                 <label className="block text-zinc-400 font-bold mb-1.5 uppercase tracking-wider">
-                  Description
+                  Test Title
                 </label>
-                <textarea
-                  rows={3}
-                  placeholder="Describe the exam syllabus, questions count, and other guidelines..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-2.5 px-3 transition-all duration-200 text-xs resize-none"
+                <input
+                  type="text"
+                  placeholder="e.g. IOE Physics Module A"
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-2.5 px-3 transition-all duration-200 text-xs"
                   required
                 />
               </div>
 
-              {/* Row 3: Google Form Link */}
+              {/* Row 2: Google Form Link */}
               <div>
                 <label className="block text-zinc-400 font-bold mb-1.5 uppercase tracking-wider">
                   Google Form Link
@@ -951,53 +898,38 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              {/* Row 4: Thumbnail URL */}
+              {/* Row 3: Category */}
               <div>
                 <label className="block text-zinc-400 font-bold mb-1.5 uppercase tracking-wider">
-                  Thumbnail Image URL
+                  Test Category
                 </label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/photo-..."
-                  value={formThumbnail}
-                  onChange={(e) => setFormThumbnail(e.target.value)}
+                <select
+                  value={formCategory}
+                  onChange={(e) =>
+                    setFormCategory(e.target.value as "TIMED" | "NON_TIMED")
+                  }
                   className="w-full bg-zinc-950 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-2.5 px-3 transition-all duration-200 text-xs"
-                  required
-                />
+                >
+                  <option value="NON_TIMED">Non Timed</option>
+                  <option value="TIMED">Timed</option>
+                </select>
               </div>
 
-              {/* Row 5: Difficulty & Active State */}
-              <div className="grid md:grid-cols-2 gap-4 items-center pt-2">
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1.5 uppercase tracking-wider">
-                    Difficulty Level
-                  </label>
-                  <select
-                    value={formDifficulty}
-                    onChange={(e) => setFormDifficulty(e.target.value as any)}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-2.5 px-3 transition-all duration-200 text-xs cursor-pointer"
-                  >
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2 pl-2">
-                  <input
-                    type="checkbox"
-                    id="isActiveCheckbox"
-                    checked={formIsActive}
-                    onChange={(e) => setFormIsActive(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-800 bg-zinc-950 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-zinc-900 cursor-pointer"
-                  />
-                  <label
-                    htmlFor="isActiveCheckbox"
-                    className="text-zinc-300 font-medium cursor-pointer"
-                  >
-                    Mock Test is Active & Visible
-                  </label>
-                </div>
+              {/* Row 4: Active State */}
+              <div className="flex items-center gap-2 pl-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="isActiveCheckbox"
+                  checked={formIsActive}
+                  onChange={(e) => setFormIsActive(e.target.checked)}
+                  className="h-4 w-4 rounded border-zinc-800 bg-zinc-950 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-zinc-900 cursor-pointer"
+                />
+                <label
+                  htmlFor="isActiveCheckbox"
+                  className="text-zinc-300 font-medium cursor-pointer"
+                >
+                  Mock Test is Active & Visible
+                </label>
               </div>
 
               {/* Submit Buttons */}
