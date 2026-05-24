@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Timer,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function PricingPage() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -34,7 +35,7 @@ export default function PricingPage() {
   const [checkingStatus, setCheckingStatus] = useState(true);
 
   const esewaNumber = "9812999599";
-  const accountName = "PrepEd Mock Tests Pvt. Ltd.";
+  const accountName = "Sameer Basnet";
 
   // Fetch payment status using AuthContext
   useEffect(() => {
@@ -178,30 +179,14 @@ export default function PricingPage() {
                 <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-zinc-800 bg-zinc-950 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 h-12 w-12 bg-emerald-500/5 rounded-full blur-xl" />
 
-                  {/* Mock QR container */}
+                  {/* QR container */}
                   <div className="relative h-44 w-44 rounded-xl border-4 border-emerald-500 bg-white p-3 shadow-inner flex items-center justify-center">
-                    {/* Visual QR boxes representation */}
-                    <div className="w-full h-full flex flex-col gap-2 opacity-95">
-                      <div className="flex gap-2 h-[30%]">
-                        <div className="w-[30%] bg-emerald-600 rounded-sm" />
-                        <div className="flex-1 bg-zinc-950 rounded-sm" />
-                        <div className="w-[30%] bg-emerald-600 rounded-sm" />
-                      </div>
-                      <div className="flex-1 flex gap-2">
-                        <div className="w-[20%] bg-zinc-950 rounded-sm" />
-                        <div className="flex-1 bg-emerald-700/60 rounded-sm border border-dashed border-emerald-500" />
-                        <div className="w-[20%] bg-zinc-950 rounded-sm" />
-                      </div>
-                      <div className="flex gap-2 h-[30%]">
-                        <div className="w-[30%] bg-emerald-600 rounded-sm" />
-                        <div className="flex-1 bg-zinc-950 rounded-sm" />
-                        <div className="w-[30%] bg-emerald-600 rounded-sm" />
-                      </div>
-                    </div>
-                    {/* Center Logo marker */}
-                    <div className="absolute inset-0 m-auto h-10 w-10 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg border border-white text-white font-extrabold text-[10px]">
-                      eSewa
-                    </div>
+                    <Image
+                      src="/qr.jpg"
+                      alt="eSewa QR Code for Payment"
+                      fill
+                      className="object-contain"
+                    />
                   </div>
                   <span className="text-xs text-zinc-500 mt-4 text-center">
                     Scan to Pay Rs. 499
@@ -418,8 +403,6 @@ export default function PricingPage() {
                       </button>
                     </form>
                   )}
-
-                 
                 </>
               )}
             </div>
