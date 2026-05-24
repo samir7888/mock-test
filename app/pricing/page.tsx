@@ -5,12 +5,12 @@ import { useUser, SignInButton } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/components/ToastProvider";
 import { useAuth } from "@/contexts/AuthContext";
+import ImageUpload from "@/components/ImageUpload";
 import {
   submitPaymentRequest,
   getUserPaymentRequestStatus,
 } from "@/actions/admin";
 import {
-  CreditCard,
   Copy,
   Check,
   Upload,
@@ -33,7 +33,7 @@ export default function PricingPage() {
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
   const [checkingStatus, setCheckingStatus] = useState(true);
 
-  const esewaNumber = "9800000000";
+  const esewaNumber = "9812999599";
   const accountName = "PrepEd Mock Tests Pvt. Ltd.";
 
   // Fetch payment status using AuthContext
@@ -66,20 +66,19 @@ export default function PricingPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleUploadSuccess = (url: string) => {
+    setScreenshotUrl(url);
+    success("Screenshot uploaded successfully!");
+  };
+
+  const handleUploadError = (errorMessage: string) => {
+    error(errorMessage);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!screenshotUrl.trim()) {
-      error("Please enter a transaction details/screenshot link");
-      return;
-    }
-
-    if (
-      !screenshotUrl.startsWith("http://") &&
-      !screenshotUrl.startsWith("https://")
-    ) {
-      error(
-        "Transaction verification must be a valid URL (e.g. image link, details page, or placeholder URL)"
-      );
+      error("Please upload your payment screenshot first");
       return;
     }
 
@@ -350,7 +349,7 @@ export default function PricingPage() {
                             Your payment request was rejected. This usually
                             happens if the screenshot was unclear or the
                             transaction details didn't match. Please submit a
-                            valid transaction details URL below to re-verify.
+                            new payment screenshot below.
                           </p>
                           <button
                             onClick={() => setPaymentRequest(null)}
@@ -360,32 +359,49 @@ export default function PricingPage() {
                           </button>
                         </>
                       )}
+
+                      {paymentRequest.status === "APPROVED" && (
+                        <>
+                          <CheckCircle className="h-10 w-10 text-emerald-400 mx-auto mb-3" />
+                          <h3 className="font-bold text-emerald-400 text-lg">
+                            Payment Approved!
+                          </h3>
+                          <p className="text-xs text-zinc-400 max-w-sm mx-auto mt-1 leading-relaxed">
+                            Your payment has been approved! Your account should
+                            be activated shortly.
+                          </p>
+                        </>
+                      )}
                     </div>
                   ) : (
                     /* Form to submit */
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
-                          Payment Screenshot / Transaction Link
+                        <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">
+                          Upload Payment Screenshot
                         </label>
-                        <input
-                          type="url"
-                          placeholder="https://example.com/screenshot.jpg (or any image/receipt URL)"
-                          value={screenshotUrl}
-                          onChange={(e) => setScreenshotUrl(e.target.value)}
-                          className="w-full bg-zinc-950/80 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-zinc-100 rounded-xl py-3 px-4 transition-all duration-200 placeholder:text-zinc-600 text-sm"
+
+                        <ImageUpload
+                          onUploadSuccess={handleUploadSuccess}
+                          onUploadError={handleUploadError}
                           disabled={submitting}
-                          required
                         />
-                        <span className="text-[10px] text-zinc-500 mt-2 block pl-1">
-                          *Please upload your eSewa receipt to an image sharing
-                          site (e.g. imgur, postimages) and paste the link here.
-                        </span>
+
+                        {screenshotUrl && (
+                          <div className="mt-4 p-3 bg-zinc-950 border border-zinc-800 rounded-xl">
+                            <span className="text-[10px] text-zinc-500 uppercase font-bold block mb-1">
+                              Uploaded Screenshot URL:
+                            </span>
+                            <span className="text-zinc-300 font-mono text-xs break-all">
+                              {screenshotUrl}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <button
                         type="submit"
-                        disabled={submitting}
+                        disabled={submitting || !screenshotUrl}
                         className="w-full flex h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 font-bold text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:shadow-none active:scale-[0.98] transition-all duration-200 text-sm"
                       >
                         {submitting ? (
@@ -402,6 +418,8 @@ export default function PricingPage() {
                       </button>
                     </form>
                   )}
+
+                 
                 </>
               )}
             </div>

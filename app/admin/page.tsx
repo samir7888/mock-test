@@ -178,6 +178,14 @@ export default function AdminDashboardPage() {
 
   // Actions: Payments approval
   const handleApprovePayment = async (requestId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to approve this payment request? This will grant the user premium access."
+      )
+    ) {
+      return;
+    }
+
     try {
       const res = await adminApprovePaymentRequest(requestId);
       if (res.success) {
@@ -192,10 +200,19 @@ export default function AdminDashboardPage() {
   };
 
   const handleRejectPayment = async (requestId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to reject this payment request? Please provide a reason."
+      )
+    ) {
+      return;
+    }
+
+  
+
     try {
       const res = await adminRejectPaymentRequest(requestId);
       if (res.success) {
-        info("Payment request rejected.");
         loadAnalyticsAndPayments();
       } else {
         error(res.error || "Failed to reject payment");
@@ -203,6 +220,49 @@ export default function AdminDashboardPage() {
     } catch (err: any) {
       error(err.message || "Error occurred");
     }
+  };
+
+  const handleBulkApprove = async () => {
+    const pendingRequests = paymentsList.filter(
+      (req) => req.status === "PENDING"
+    );
+    if (pendingRequests.length === 0) {
+      info("No pending requests to approve.");
+      return;
+    }
+
+    if (
+      !confirm(
+        `Are you sure you want to approve all ${pendingRequests.length} pending payment requests?`
+      )
+    ) {
+      return;
+    }
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const req of pendingRequests) {
+      try {
+        const res = await adminApprovePaymentRequest(req.id);
+        if (res.success) {
+          successCount++;
+        } else {
+          errorCount++;
+        }
+      } catch (err) {
+        errorCount++;
+      }
+    }
+
+    if (successCount > 0) {
+      success(`Successfully approved ${successCount} payment requests.`);
+    }
+    if (errorCount > 0) {
+      error(`Failed to approve ${errorCount} payment requests.`);
+    }
+
+    loadAnalyticsAndPayments();
   };
 
   // Actions: CRUD Mock Tests
@@ -375,7 +435,7 @@ export default function AdminDashboardPage() {
               <Award className="h-4 w-4" />
               Mock Test CRUD
             </button>
-          </div>  
+          </div>
         </div>
 
         {/* Analytics stats row */}
@@ -428,10 +488,32 @@ export default function AdminDashboardPage() {
         {activeTab === "analytics" && (
           <div className="space-y-8">
             <div className="rounded-3xl border border-zinc-800 bg-zinc-900/10 p-6 md:p-8 backdrop-blur-md">
-              <h2 className="text-lg font-bold text-zinc-100 mb-6 flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-indigo-400" />
-                eSewa Payment Verifications Queue
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-indigo-400" />
+                  eSewa Payment Verifications Queue
+                </h2>
+
+                {/* Bulk Actions */}
+                {paymentsList.filter((req) => req.status === "PENDING").length >
+                  0 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleBulkApprove}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/30 px-3 text-xs font-bold text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all"
+                      title="Approve all pending requests"
+                    >
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      Approve All (
+                      {
+                        paymentsList.filter((req) => req.status === "PENDING")
+                          .length
+                      }
+                      )
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {paymentsLoading ? (
                 <div className="flex justify-center py-10">
